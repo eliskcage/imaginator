@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Google Auth Test — ShortFactory</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Poppins',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;padding:20px;}
+
+.topbar{background:#111;border:1px solid #222;border-radius:12px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;max-width:800px;margin-left:auto;margin-right:auto;}
+.brand{font-family:'Orbitron',sans-serif;font-size:14px;color:#FFD700;letter-spacing:2px;}
+.badge{font-size:10px;color:#000;background:#00cc66;padding:3px 10px;border-radius:10px;font-weight:700;letter-spacing:1px;}
+
+.container{max-width:800px;margin:0 auto;}
+
+/* Setup guide */
+.setup{background:#1a1000;border:1px solid #FFD700;border-radius:12px;padding:20px;margin-bottom:24px;}
+.setup h2{font-family:'Orbitron',sans-serif;font-size:14px;color:#FFD700;letter-spacing:2px;margin-bottom:12px;}
+.setup ol{padding-left:20px;font-size:13px;color:#ccc;line-height:2;}
+.setup code{background:#000;padding:2px 8px;border-radius:4px;font-size:12px;color:#FFD700;}
+.setup a{color:#FFD700;}
+
+/* Client ID input */
+.config{background:#151515;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:24px;}
+.config label{font-family:'Orbitron',sans-serif;font-size:11px;color:#888;letter-spacing:2px;display:block;margin-bottom:8px;}
+.config input{width:100%;padding:12px 16px;background:#0a0a0a;border:1px solid #333;border-radius:8px;color:#FFD700;font-size:14px;font-family:monospace;}
+.config input:focus{border-color:#FFD700;outline:none;}
+.config .hint{font-size:11px;color:#555;margin-top:6px;}
+
+/* Sign in button area */
+.auth-area{text-align:center;margin-bottom:30px;}
+.auth-btn{display:inline-flex;align-items:center;gap:12px;padding:16px 40px;background:#fff;border:none;border-radius:30px;font-family:'Poppins',sans-serif;font-size:16px;font-weight:600;color:#333;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(255,255,255,0.15);}
+.auth-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,255,255,0.25);}
+.auth-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.auth-btn svg{width:24px;height:24px;}
+.signout-btn{display:inline-block;margin-top:10px;padding:8px 20px;background:transparent;border:1px solid #555;border-radius:20px;color:#888;font-size:12px;cursor:pointer;transition:all 0.2s;}
+.signout-btn:hover{border-color:#ff4444;color:#ff4444;}
+
+/* Profile card */
+.profile{display:flex;align-items:center;gap:16px;background:#151515;border:1px solid #222;border-radius:12px;padding:16px 20px;margin-bottom:20px;}
+.profile img{width:56px;height:56px;border-radius:50%;border:2px solid #FFD700;}
+.profile-info h3{font-size:16px;color:#fff;margin-bottom:2px;}
+.profile-info p{font-size:12px;color:#888;}
+
+/* Test panels */
+.panel{background:#151515;border:1px solid #222;border-radius:12px;padding:20px;margin-bottom:16px;transition:border-color 0.3s;}
+.panel.success{border-color:#00cc66;}
+.panel.fail{border-color:#ff4444;}
+.panel.pending{border-color:#FFD700;}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.panel-title{font-family:'Orbitron',sans-serif;font-size:12px;color:#FFD700;letter-spacing:2px;}
+.panel-status{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:700;letter-spacing:1px;}
+.status-wait{background:#333;color:#888;}
+.status-ok{background:rgba(0,204,102,0.2);color:#00cc66;}
+.status-err{background:rgba(255,68,68,0.2);color:#ff4444;}
+.status-test{background:rgba(255,215,0,0.2);color:#FFD700;}
+
+.panel-body{font-size:13px;color:#aaa;line-height:1.8;}
+.panel-body code{background:#0a0a0a;padding:2px 6px;border-radius:4px;font-size:11px;color:#FFD700;}
+.panel-body .item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;}
+.panel-body .item:last-child{border:none;}
+.panel-body .label{color:#888;}
+.panel-body .value{color:#fff;font-weight:600;text-align:right;max-width:60%;word-break:break-all;}
+
+.test-btn{padding:10px 20px;background:#222;border:1px solid #FFD700;border-radius:8px;color:#FFD700;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;margin-top:8px;}
+.test-btn:hover{background:#2a2a10;transform:scale(1.02);}
+.test-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+/* Log */
+.log{background:#0a0a0a;border:1px solid #222;border-radius:10px;padding:12px;max-height:200px;overflow-y:auto;font-size:11px;font-family:monospace;color:#555;margin-top:20px;}
+.log div{padding:3px 0;border-bottom:1px solid #111;}
+.log .ok{color:#4f4;}.log .warn{color:#fa0;}.log .err{color:#f44;}.log .info{color:#4af;}
+
+/* Scopes grid */
+.scopes{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.scope{padding:4px 10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;font-size:10px;color:#888;font-family:monospace;}
+.scope.granted{border-color:#00cc66;color:#00cc66;background:rgba(0,204,102,0.05);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">SHORTF&#9650;CTORY &mdash; GOOGLE AUTH TEST</div>
+  <div class="badge">TEST PAGE</div>
+</div>
+
+<div class="container">
+
+  <!-- SETUP GUIDE -->
+  <div class="setup" id="setupGuide">
+    <h2>⚡ SETUP (ONE TIME)</h2>
+    <ol>
+      <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+      <li>Create a new project (or use existing) — name it <code>ShortFactory</code></li>
+      <li>Enable these APIs (APIs & Services → Library):
+        <br><code>YouTube Data API v3</code> &bull; <code>Google Drive API</code> &bull; <code>Google People API</code>
+      </li>
+      <li>OAuth consent screen → External → App name: <code>ShortFactory Imaginator</code>
+        <br>Add scopes: <code>userinfo.email</code>, <code>userinfo.profile</code>, <code>drive.file</code>, <code>youtube.upload</code>
+      </li>
+      <li>Credentials → Create OAuth 2.0 Client ID → Web application
+        <br>Authorized JS origins: <code>https://www.shortfactory.shop</code>
+        <br>Also add: <code>http://localhost</code> (for testing)
+      </li>
+      <li>Copy the <b>Client ID</b> and paste it below</li>
+    </ol>
+  </div>
+
+  <!-- CLIENT ID CONFIG -->
+  <div class="config">
+    <label>GOOGLE OAUTH CLIENT ID</label>
+    <input type="text" id="clientIdInput" value="246057462897-mui96hjeuk9abvlkgvvqdfdeiknbmojb.apps.googleusercontent.com" spellcheck="false">
+    <div class="hint">Saved to localStorage — only need to do this once</div>
+  </div>
+
+  <!-- SIGN IN -->
+  <div class="auth-area" id="authArea">
+    <button class="auth-btn" id="signInBtn" onclick="doSignIn()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Sign in with Google
+    </button>
+    <div id="signOutArea" style="display:none;">
+      <button class="signout-btn" onclick="doSignOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- PROFILE (hidden until signed in) -->
+  <div id="profileCard" class="profile" style="display:none;">
+    <img id="userAvatar" src="" alt="">
+    <div class="profile-info">
+      <h3 id="userName">—</h3>
+      <p id="userEmail">—</p>
+    </div>
+  </div>
+
+  <!-- TEST PANELS (hidden until signed in) -->
+  <div id="testPanels" style="display:none;">
+
+    <!-- Token & Scopes -->
+    <div class="panel" id="panelToken">
+      <div class="panel-head">
+        <div class="panel-title">TOKEN & SCOPES</div>
+        <div class="panel-status status-wait" id="tokenStatus">WAITING</div>
+      </div>
+      <div class="panel-body">
+        <div class="item"><span class="label">Access Token</span><span class="value" id="tokenPreview">—</span></div>
+        <div class="item"><span class="label">Expires In</span><span class="value" id="tokenExpiry">—</span></div>
+        <div class="item"><span class="label">Scopes Granted</span></div>
+        <div class="scopes" id="scopesList"></div>
+      </div>
+    </div>
+
+    <!-- Google Drive -->
+    <div class="panel" id="panelDrive">
+      <div class="panel-head">
+        <div class="panel-title">GOOGLE DRIVE</div>
+        <div class="panel-status status-wait" id="driveStatus">WAITING</div>
+      </div>
+      <div class="panel-body">
+        <div id="driveInfo">Click test to check Drive access and create a ShortFactory folder.</div>
+        <div class="item" id="driveFolderRow" style="display:none;"><span class="label">SF Folder ID</span><span class="value" id="driveFolderId">—</span></div>
+        <div class="item" id="driveQuotaRow" style="display:none;"><span class="label">Storage Used</span><span class="value" id="driveQuota">—</span></div>
+        <div class="item" id="driveFilesRow" style="display:none;"><span class="label">Files in SF Folder</span><span class="value" id="driveFiles">—</span></div>
+        <button class="test-btn" id="driveTestBtn" onclick="testDrive()">TEST DRIVE ACCESS</button>
+      </div>
+    </div>
+
+    <!-- YouTube -->
+    <div class="panel" id="panelYT">
+      <div class="panel-head">
+        <div class="panel-title">YOUTUBE</div>
+        <div class="panel-status status-wait" id="ytStatus">WAITING</div>
+      </div>
+      <div class="panel-body">
+        <div id="ytInfo">Click test to check YouTube channel access.</div>
+        <div class="item" id="ytChannelRow" style="display:none;"><span class="label">Channel</span><span class="value" id="ytChannel">—</span></div>
+        <div class="item" id="ytSubsRow" style="display:none;"><span class="label">Subscribers</span><span class="value" id="ytSubs">—</span></div>
+        <div class="item" id="ytVidsRow" style="display:none;"><span class="label">Videos</span><span class="value" id="ytVids">—</span></div>
+        <div class="item" id="ytUploadRow" style="display:none;"><span class="label">Upload Ready</span><span class="value" id="ytUpload">—</span></div>
+        <button class="test-btn" id="ytTestBtn" onclick="testYouTube()">TEST YOUTUBE ACCESS</button>
+      </div>
+    </div>
+
+    <!-- Payment / Google Pay -->
+    <div class="panel" id="panelPay">
+      <div class="panel-head">
+        <div class="panel-title">PAYMENTS</div>
+        <div class="panel-status status-wait" id="payStatus">WAITING</div>
+      </div>
+      <div class="panel-body">
+        <div id="payInfo">Google Pay integration check — detects if user has payment methods available.</div>
+        <div class="item" id="payReadyRow" style="display:none;"><span class="label">Google Pay Ready</span><span class="value" id="payReady">—</span></div>
+        <button class="test-btn" id="payTestBtn" onclick="testPayments()">TEST PAYMENT READINESS</button>
+      </div>
+    </div>
+
+    <!-- Save Test -->
+    <div class="panel" id="panelSave">
+      <div class="panel-head">
+        <div class="panel-title">SAVE TO DRIVE TEST</div>
+        <div class="panel-status status-wait" id="saveStatus">WAITING</div>
+      </div>
+      <div class="panel-body">
+        <div>Creates a test file in the ShortFactory folder on user's Google Drive.</div>
+        <button class="test-btn" id="saveTestBtn" onclick="testSaveFile()">SAVE TEST FILE</button>
+        <div class="item" id="saveResultRow" style="display:none;"><span class="label">Saved File</span><span class="value" id="saveResult">—</span></div>
+      </div>
+    </div>
+
+    <!-- Run All -->
+    <div style="text-align:center;margin:20px 0;">
+      <button class="test-btn" onclick="runAllTests()" style="padding:14px 40px;font-size:13px;background:linear-gradient(135deg,#FFD700,#ff6b35);color:#000;border:none;">RUN ALL TESTS</button>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="log" id="log"></div>
+
+</div>
+
+<script>
+var accessToken=null;
+var clientId='';
+var sfFolderId=null;
+
+// Requested scopes
+var SCOPES=[
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile',
+  'https://www.googleapis.com/auth/drive.file',
+  'https://www.googleapis.com/auth/youtube.upload',
+  'https://www.googleapis.com/auth/youtube.readonly'
+];
+
+// ── Client ID persistence ──
+var savedId=localStorage.getItem('sf_google_client_id');
+var inputEl=document.getElementById('clientIdInput');
+if(savedId){
+  inputEl.value=savedId;
+  clientId=savedId;
+} else if(inputEl.value&&inputEl.value.indexOf('.apps.googleusercontent.com')>-1){
+  clientId=inputEl.value.trim();
+  localStorage.setItem('sf_google_client_id',clientId);
+}
+document.getElementById('clientIdInput').addEventListener('change',function(){
+  clientId=this.value.trim();
+  localStorage.setItem('sf_google_client_id',clientId);
+  log('Client ID saved','ok');
+});
+document.getElementById('clientIdInput').addEventListener('input',function(){
+  clientId=this.value.trim();
+});
+
+// ── Logging ──
+function log(msg,cls){
+  var d=document.getElementById('log');
+  var line=document.createElement('div');
+  line.className=cls||'info';
+  line.textContent='['+new Date().toLocaleTimeString()+'] '+msg;
+  d.appendChild(line);
+  d.scrollTop=d.scrollHeight;
+}
+
+// ── Google Sign In ──
+function doSignIn(){
+  if(!clientId||clientId.indexOf('.apps.googleusercontent.com')<0){
+    log('Enter a valid Google OAuth Client ID first!','err');
+    document.getElementById('clientIdInput').style.borderColor='#ff4444';
+    document.getElementById('clientIdInput').focus();
+    return;
+  }
+  if(typeof google==='undefined'||!google.accounts){
+    log('Google Identity Services still loading — wait a moment and try again','warn');
+    return;
+  }
+
+  log('Requesting Google sign-in with scopes: '+SCOPES.length+' permissions','info');
+
+  var tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:clientId,
+    scope:SCOPES.join(' '),
+    callback:handleAuthResponse
+  });
+  tokenClient.requestAccessToken();
+}
+
+function handleAuthResponse(response){
+  if(response.error){
+    log('Auth error: '+response.error+' — '+(response.error_description||''),'err');
+    return;
+  }
+
+  accessToken=response.access_token;
+  log('Signed in! Access token received (expires in '+response.expires_in+'s)','ok');
+
+  // Show token info
+  document.getElementById('tokenPreview').textContent=accessToken.substring(0,20)+'...';
+  document.getElementById('tokenExpiry').textContent=response.expires_in+'s (~'+Math.round(response.expires_in/60)+' min)';
+  setStatus('tokenStatus','status-ok','CONNECTED');
+  document.getElementById('panelToken').classList.add('success');
+
+  // Parse granted scopes
+  var granted=(response.scope||'').split(' ');
+  var scopesEl=document.getElementById('scopesList');
+  scopesEl.innerHTML='';
+  SCOPES.forEach(function(s){
+    var tag=document.createElement('span');
+    tag.className='scope'+(granted.indexOf(s)>-1?' granted':'');
+    tag.textContent=s.split('/').pop();
+    scopesEl.appendChild(tag);
+    if(granted.indexOf(s)>-1) log('Scope granted: '+s.split('/').pop(),'ok');
+    else log('Scope NOT granted: '+s.split('/').pop(),'warn');
+  });
+
+  // Fetch user profile
+  fetchProfile();
+
+  // Show panels
+  document.getElementById('testPanels').style.display='block';
+  document.getElementById('signOutArea').style.display='block';
+  document.getElementById('signInBtn').textContent='Signed In';
+  document.getElementById('signInBtn').disabled=true;
+}
+
+function fetchProfile(){
+  gapi('https://www.googleapis.com/oauth2/v2/userinfo',function(data){
+    document.getElementById('userName').textContent=data.name||'Unknown';
+    document.getElementById('userEmail').textContent=data.email||'—';
+    if(data.picture) document.getElementById('userAvatar').src=data.picture;
+    document.getElementById('profileCard').style.display='flex';
+    log('Profile loaded: '+data.name+' ('+data.email+')','ok');
+
+    // Save for Imaginator
+    localStorage.setItem('sf_google_name',data.name||'');
+    localStorage.setItem('sf_google_email',data.email||'');
+    localStorage.setItem('sf_google_avatar',data.picture||'');
+  });
+}
+
+function doSignOut(){
+  if(accessToken&&typeof google!=='undefined'){
+    google.accounts.oauth2.revoke(accessToken,function(){
+      log('Token revoked','info');
+    });
+  }
+  accessToken=null;
+  document.getElementById('testPanels').style.display='none';
+  document.getElementById('profileCard').style.display='none';
+  document.getElementById('signOutArea').style.display='none';
+  document.getElementById('signInBtn').textContent='Sign in with Google';
+  document.getElementById('signInBtn').disabled=false;
+  // Reset statuses
+  ['tokenStatus','driveStatus','ytStatus','payStatus','saveStatus'].forEach(function(id){
+    setStatus(id,'status-wait','WAITING');
+  });
+  ['panelToken','panelDrive','panelYT','panelPay','panelSave'].forEach(function(id){
+    document.getElementById(id).className='panel';
+  });
+  log('Signed out','info');
+}
+
+// ── API Helper ──
+function gapi(url,onSuccess,onError){
+  fetch(url,{headers:{'Authorization':'Bearer '+accessToken}})
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    })
+    .then(onSuccess)
+    .catch(function(e){
+      log('API error ('+url.split('?')[0].split('/').pop()+'): '+e.message,'err');
+      if(onError) onError(e);
+    });
+}
+
+function setStatus(id,cls,text){
+  var el=document.getElementById(id);
+  el.className='panel-status '+cls;
+  el.textContent=text;
+}
+
+// ── TEST: Google Drive ──
+function testDrive(){
+  if(!accessToken){log('Sign in first','warn');return;}
+  setStatus('driveStatus','status-test','TESTING...');
+  log('Testing Google Drive access...','info');
+
+  // 1. Check quota
+  gapi('https://www.googleapis.com/drive/v3/about?fields=storageQuota,user',function(about){
+    var q=about.storageQuota;
+    if(q){
+      var used=formatBytes(parseInt(q.usage||0));
+      var total=q.limit?formatBytes(parseInt(q.limit)):'Unlimited';
+      document.getElementById('driveQuota').textContent=used+' / '+total;
+      document.getElementById('driveQuotaRow').style.display='flex';
+      log('Drive quota: '+used+' used','ok');
+    }
+
+    // 2. Find or create ShortFactory folder
+    gapi('https://www.googleapis.com/drive/v3/files?q=name%3D%27ShortFactory%27+and+mimeType%3D%27application/vnd.google-apps.folder%27+and+trashed%3Dfalse&fields=files(id,name)',function(result){
+      if(result.files&&result.files.length>0){
+        sfFolderId=result.files[0].id;
+        document.getElementById('driveFolderId').textContent=sfFolderId;
+        document.getElementById('driveFolderRow').style.display='flex';
+        log('Found existing ShortFactory folder: '+sfFolderId,'ok');
+        countFolderFiles();
+      } else {
+        // Create folder
+        log('Creating ShortFactory folder on Drive...','info');
+        fetch('https://www.googleapis.com/drive/v3/files',{
+          method:'POST',
+          headers:{
+            'Authorization':'Bearer '+accessToken,
+            'Content-Type':'application/json'
+          },
+          body:JSON.stringify({
+            name:'ShortFactory',
+            mimeType:'application/vnd.google-apps.folder',
+            description:'Videos and projects created with ShortFactory Imaginator'
+          })
+        }).then(function(r){return r.json();}).then(function(folder){
+          sfFolderId=folder.id;
+          document.getElementById('driveFolderId').textContent=sfFolderId;
+          document.getElementById('driveFolderRow').style.display='flex';
+          log('Created ShortFactory folder: '+sfFolderId,'ok');
+          document.getElementById('driveFiles').textContent='0';
+          document.getElementById('driveFilesRow').style.display='flex';
+          setStatus('driveStatus','status-ok','CONNECTED');
+          document.getElementById('panelDrive').classList.add('success');
+        });
+      }
+    });
+  },function(){
+    setStatus('driveStatus','status-err','FAILED');
+    document.getElementById('panelDrive').classList.add('fail');
+  });
+}
+
+function countFolderFiles(){
+  gapi("https://www.googleapis.com/drive/v3/files?q='"+sfFolderId+"'+in+parents+and+trashed%3Dfalse&fields=files(id,name,size,createdTime)&pageSize=100",function(result){
+    var count=result.files?result.files.length:0;
+    document.getElementById('driveFiles').textContent=count;
+    document.getElementById('driveFilesRow').style.display='flex';
+    setStatus('driveStatus','status-ok','CONNECTED');
+    document.getElementById('panelDrive').classList.add('success');
+    log('Drive test passed — '+count+' files in ShortFactory folder','ok');
+  });
+}
+
+// ── TEST: YouTube ──
+function testYouTube(){
+  if(!accessToken){log('Sign in first','warn');return;}
+  setStatus('ytStatus','status-test','TESTING...');
+  log('Testing YouTube access...','info');
+
+  gapi('https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&mine=true',function(data){
+    if(!data.items||!data.items.length){
+      log('No YouTube channel found for this account','warn');
+      setStatus('ytStatus','status-err','NO CHANNEL');
+      document.getElementById('panelYT').classList.add('fail');
+      return;
+    }
+    var ch=data.items[0];
+    document.getElementById('ytChannel').textContent=ch.snippet.title;
+    document.getElementById('ytChannelRow').style.display='flex';
+    document.getElementById('ytSubs').textContent=parseInt(ch.statistics.subscriberCount||0).toLocaleString();
+    document.getElementById('ytSubsRow').style.display='flex';
+    document.getElementById('ytVids').textContent=parseInt(ch.statistics.videoCount||0).toLocaleString();
+    document.getElementById('ytVidsRow').style.display='flex';
+    document.getElementById('ytUpload').textContent='YES — Ready to publish Shorts';
+    document.getElementById('ytUpload').style.color='#00cc66';
+    document.getElementById('ytUploadRow').style.display='flex';
+
+    setStatus('ytStatus','status-ok','CONNECTED');
+    document.getElementById('panelYT').classList.add('success');
+    log('YouTube test passed — Channel: '+ch.snippet.title+' ('+ch.statistics.subscriberCount+' subs)','ok');
+  },function(){
+    setStatus('ytStatus','status-err','FAILED');
+    document.getElementById('panelYT').classList.add('fail');
+  });
+}
+
+// ── TEST: Payments (Google Pay readiness) ──
+function testPayments(){
+  setStatus('payStatus','status-test','TESTING...');
+  log('Checking Google Pay readiness...','info');
+
+  // Google Pay API check — does browser/device support it?
+  if(!window.PaymentRequest){
+    log('PaymentRequest API not supported in this browser','warn');
+    document.getElementById('payReady').textContent='Not supported in this browser';
+    document.getElementById('payReady').style.color='#ff4444';
+    document.getElementById('payReadyRow').style.display='flex';
+    setStatus('payStatus','status-err','NOT SUPPORTED');
+    document.getElementById('panelPay').classList.add('fail');
+    return;
+  }
+
+  // Check if Google Pay is available
+  var supportedMethods=[{
+    supportedMethods:'https://google.com/pay',
+    data:{
+      environment:'TEST',
+      apiVersion:2,
+      apiVersionMinor:0,
+      allowedPaymentMethods:[{
+        type:'CARD',
+        parameters:{allowedAuthMethods:['PAN_ONLY','CRYPTOGRAM_3DS'],allowedCardNetworks:['VISA','MASTERCARD','AMEX']},
+        tokenizationSpecification:{type:'PAYMENT_GATEWAY',parameters:{gateway:'stripe',gatewayMerchantId:'acct_placeholder'}}
+      }]
+    }
+  }];
+
+  var details={total:{label:'Test',amount:{currency:'GBP',value:'0.00'}}};
+
+  try{
+    var request=new PaymentRequest(supportedMethods,details);
+    request.canMakePayment().then(function(result){
+      if(result){
+        document.getElementById('payReady').textContent='YES — Google Pay available with saved cards';
+        document.getElementById('payReady').style.color='#00cc66';
+        setStatus('payStatus','status-ok','AVAILABLE');
+        document.getElementById('panelPay').classList.add('success');
+        log('Google Pay is available — user has saved payment methods','ok');
+      } else {
+        document.getElementById('payReady').textContent='No saved payment methods found';
+        document.getElementById('payReady').style.color='#FFD700';
+        setStatus('payStatus','status-ok','NO CARDS');
+        log('Google Pay supported but no saved cards detected','warn');
+      }
+      document.getElementById('payReadyRow').style.display='flex';
+    }).catch(function(e){
+      document.getElementById('payReady').textContent='Check failed: '+e.message;
+      document.getElementById('payReadyRow').style.display='flex';
+      setStatus('payStatus','status-err','ERROR');
+      log('Payment check error: '+e.message,'err');
+    });
+  }catch(e){
+    document.getElementById('payReady').textContent='Error: '+e.message;
+    document.getElementById('payReadyRow').style.display='flex';
+    setStatus('payStatus','status-err','ERROR');
+    log('Payment API error: '+e.message,'err');
+  }
+}
+
+// ── TEST: Save file to Drive ──
+function testSaveFile(){
+  if(!accessToken){log('Sign in first','warn');return;}
+  if(!sfFolderId){log('Run Drive test first to create the ShortFactory folder','warn');return;}
+  setStatus('saveStatus','status-test','SAVING...');
+  log('Saving test file to ShortFactory Drive folder...','info');
+
+  var testContent=JSON.stringify({
+    app:'ShortFactory Imaginator',
+    type:'test_project',
+    created:new Date().toISOString(),
+    user:localStorage.getItem('sf_google_email')||'unknown',
+    slides:[],
+    music:null,
+    note:'This is a test file to verify Drive save functionality.'
+  },null,2);
+
+  var metadata={
+    name:'SF_Test_'+Date.now()+'.json',
+    mimeType:'application/json',
+    parents:[sfFolderId],
+    description:'ShortFactory Imaginator test file'
+  };
+
+  var form=new FormData();
+  form.append('metadata',new Blob([JSON.stringify(metadata)],{type:'application/json'}));
+  form.append('file',new Blob([testContent],{type:'application/json'}));
+
+  fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+accessToken},
+    body:form
+  }).then(function(r){
+    if(!r.ok) throw new Error('Upload failed: '+r.status);
+    return r.json();
+  }).then(function(file){
+    document.getElementById('saveResult').innerHTML='<a href="'+(file.webViewLink||'#')+'" target="_blank" style="color:#FFD700;">'+file.name+'</a>';
+    document.getElementById('saveResultRow').style.display='flex';
+    setStatus('saveStatus','status-ok','SAVED');
+    document.getElementById('panelSave').classList.add('success');
+    log('File saved to Drive: '+file.name+' ('+file.id+')','ok');
+  }).catch(function(e){
+    setStatus('saveStatus','status-err','FAILED');
+    document.getElementById('panelSave').classList.add('fail');
+    log('Save failed: '+e.message,'err');
+  });
+}
+
+// ── Run All Tests ──
+function runAllTests(){
+  log('Running all tests...','info');
+  testDrive();
+  setTimeout(testYouTube,500);
+  setTimeout(testPayments,1000);
+  // Save test needs Drive folder first, so delay more
+  setTimeout(function(){
+    if(sfFolderId) testSaveFile();
+    else log('Skipping save test — Drive folder not ready yet. Run again.','warn');
+  },3000);
+}
+
+// ── Util ──
+function formatBytes(bytes){
+  if(bytes===0)return '0 B';
+  var k=1024;
+  var sizes=['B','KB','MB','GB','TB'];
+  var i=Math.floor(Math.log(bytes)/Math.log(k));
+  return parseFloat((bytes/Math.pow(k,i)).toFixed(1))+' '+sizes[i];
+}
+
+log('Google Auth Test page loaded. Enter your Client ID and sign in to begin.','info');
+</script>
+
+</body>
+</html>

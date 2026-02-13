@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 GIANTLOVE - Wild Kinetic Animation</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: 'Arial Black', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#phone-container {
+  width: 414px;
+  height: 736px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+  border: 8px solid #333;
+  border-radius: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+}
+
+#animation-stage {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.subtitle-text {
+  position: absolute;
+  white-space: nowrap;
+  font-weight: bold;
+  text-align: center;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform-origin: center center;
+}
+
+#controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+  z-index: 100;
+}
+
+button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: transform 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+#timeline {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+  z-index: 100;
+}
+
+@media (max-width: 500px) {
+  #phone-container {
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+  }
+}
+</style>
+</head>
+<body>
+<div id="timeline">0:00</div>
+<div id="phone-container">
+  <video id="videoPlayer" loop style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 0;">
+    <source src="file:///C:/Users/User/Desktop/GIANTlove_compressed.mp4" type="video/mp4">
+  </video>
+  <div id="animation-stage" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;"></div>
+</div>
+
+<div id="controls">
+  <button id="playBtn">▶️ PLAY</button>
+  <button id="restartBtn">🔄 RESTART</button>
+</div>
+
+<script>
+let currentTime = 0;
+let isPlaying = false;
+let animationFrame = null;
+let startTime = null;
+
+// Animation data embedded directly (48 wild animations!)
+const animations = [
+  {
+    "index": 1,
+    "text": "He's so huge, like a mountain. ",
+    "start": 15.28,
+    "end": 17.28,
+    "duration": 2,
+    "entry": {
+      "effect": "slideLeft",
+      "x": 33,
+      "y": 28,
+      "scale": 1.1499905278745683,
+      "rotate": 8,
+      "opacity": 0.36606066304340257
+    },
+    "mid": null,
+    "exit": {
+      "effect": "wave",
+      "x": 63,
+      "y": 45,
+      "scale": 1.024339275443835,
+      "rotate": -43,
+      "opacity": 0.24097584332488298
+    },
+    "style": {
+      "color": "#45B7D1",
+      "fontSize": 29,
+      "blur": 5,
+      "fontWeight": "bold",
+      "textShadow": "0 0 26px #45B7D1"
+    }
+  },
+  {
+    "index": 2,
+    "text": "I smell him. ",
+    "start": 17.84,
+    "end": 18.96,
+    "duration": 1.12,
+    "entry": {
+      "effect": "fadeOut",
+      "x": 42,
+      "y": 37,
+      "scale": 0.61600580373917,
+      "rotate": -33,
+      "opacity": 0.6841692225001066
+    },
+    "mid": null,
+    "exit": {
+      "effect": "zoomOut",
+      "x": 48,
+      "y": 55,
+      "scale": 1.1547757360471012,
+      "rotate": 25,
+      "opacity": 0.2042047374094791
+    },
+    "style": {
+      "color": "#85C1E2",
+      "fontSize": 38,
+      "blur": 5,
+      "fontWeight": "normal",
+      "textShadow": "0 0 30px #85C1E2"
+    }
+  },
+  {
+    "index": 3,
+    "text": "He is so big. ",
+    "start": 19.04,
+    "end": 20.08,
+    "duration": 1.04,
+    "entry": {
+      "effect": "shake",
+      "x": 18,
+      "y": 56,
+      "scale": 1.4306574237360081,
+      "rotate": -31,
+      "opacity": 0.355334535878325
+    },
+    "mid": null,
+    "exit": {
+      "effect": "zoomOut",
+      "x": 85,
+      "y": 36,
+      "scale": 0.35101256982155504,
+      "rotate": -34,
+      "opacity": 0.6568688973011875
+    },
+    "style": {
+      "color": "#FFA07A",
+      "fontSize": 49,
+      "blur": 4,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 4,
+    "text": "I like him. ",
+    "start": 20.8,
+    "end": 21.92,
+    "duration": 1.12,
+    "entry": {
+      "effect": "zoomIn",
+      "x": 19,
+      "y": 57,
+      "scale": 0.9573973176913455,
+      "rotate": 0,
+      "opacity": 0.9897667806797996
+    },
+    "mid": {
+      "effect": "slideLeft",
+      "x": 65,
+      "y": 46,
+      "scale": 1.2116526168461275,
+      "rotate": 21,
+      "opacity": 0.620805046030911
+    },
+    "exit": {
+      "effect": "slideLeft",
+      "x": 86,
+      "y": 30,
+      "scale": 0.3832468746996943,
+      "rotate": 9,
+      "opacity": 0.5146165511783384
+    },
+    "style": {
+      "color": "#85C1E2",
+      "fontSize": 29,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 5,
+    "text": "He makes me happy. ",
+    "start": 22.08,
+    "end": 23.44,
+    "duration": 1.36,
+    "entry": {
+      "effect": "slideLeft",
+      "x": 69,
+      "y": 69,
+      "scale": 1.1702722412798412,
+      "rotate": -31,
+      "opacity": 0.7206221905353016
+    },
+    "mid": null,
+    "exit": {
+      "effect": "slideDown",
+      "x": 61,
+      "y": 79,
+      "scale": 0.6652996331302369,
+      "rotate": -11,
+      "opacity": 0.325003230590972
+    },
+    "style": {
+      "color": "#FFFFFF",
+      "fontSize": 47,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 6,
+    "text": "I climb up him, he tickles me. ",
+    "start": 23.52,
+    "end": 26.16,
+    "duration": 2.64,
+    "entry": {
+      "effect": "slideRight",
+      "x": 70,
+      "y": 52,
+      "scale": 0.5830810821469694,
+      "rotate": -19,
+      "opacity": 0.5168411519539831
+    },
+    "mid": null,
+    "exit": {
+      "effect": "slideRight",
+      "x": 56,
+      "y": 57,
+      "scale": 0.5999581834028034,
+      "rotate": -32,
+      "opacity": 0.7346736163690621
+    },
+    "style": {
+      "color": "#45B7D1",
+      "fontSize": 29,
+      "blur": 3,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 7,
+    "text": "He is so huge, like a mountain. ",
+    "start": 27.04,
+    "end": 29.117,
+    "duration": 2.077,
+    "entry": {
+      "effect": "pulse",
+      "x": 72,
+      "y": 37,
+      "scale": 1.4545801877071078,
+      "rotate": -26,
+      "opacity": 0.5027866539321171
+    },
+    "mid": null,
+    "exit": {
+      "effect": "wave",
+      "x": 88,
+      "y": 47,
+      "scale": 1.1522482798006841,
+      "rotate": -8,
+      "opacity": 0.7625877527144576
+    },
+    "style": {
+      "color": "#4ECDC4",
+      "fontSize": 28,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 8,
+    "text": "I smell him. He is so big. ",
+    "start": 29.76,
+    "end": 31.92,
+    "duration": 2.16,
+    "entry": {
+      "effect": "explode",
+      "x": 75,
+      "y": 56,
+      "scale": 0.40920172419245276,
+      "rotate": 4,
+      "opacity": 0.397015122545739
+    },
+    "mid": null,
+    "exit": {
+      "effect": "zoomOut",
+      "x": 47,
+      "y": 20,
+      "scale": 0.5792837674540086,
+      "rotate": -15,
+      "opacity": 0.25074768515140733
+    },
+    "style": {
+      "color": "#FFFFFF",
+      "fontSize": 53,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 16px #FFFFFF"
+    }
+  },
+  {
+    "index": 9,
+    "text": "I like him. He makes me happy. ",
+    "start": 32.92,
+    "end": 35.36,
+    "duration": 2.44,
+    "entry": {
+      "effect": "slideDown",
+      "x": 10,
+      "y": 44,
+      "scale": 0.7691615862079966,
+      "rotate": 0,
+      "opacity": 0.6626417942791152
+    },
+    "mid": null,
+    "exit": {
+      "effect": "shake",
+      "x": 69,
+      "y": 75,
+      "scale": 0.6004563205272438,
+      "rotate": -27,
+      "opacity": 0.9866295548724304
+    },
+    "style": {
+      "color": "#FFA07A",
+      "fontSize": 37,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 10,
+    "text": "I climb up him. ",
+    "start": 35.44,
+    "end": 36.88,
+    "duration": 1.44,
+    "entry": {
+      "effect": "shrink",
+      "x": 77,
+      "y": 74,
+      "scale": 1.3158861715597638,
+      "rotate": 23,
+      "opacity": 0.6208440779176136
+    },
+    "mid": null,
+    "exit": {
+      "effect": "glitch",
+      "x": 83,
+      "y": 31,
+      "scale": 0.3127292914191818,
+      "rotate": -7,
+      "opacity": 0.4850428398908522
+    },
+    "style": {
+      "color": "#BB8FCE",
+      "fontSize": 63,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 11,
+    "text": "He tickles me. ",
+    "start": 36.92,
+    "end": 37.927,
+    "duration": 1.007,
+    "entry": {
+      "effect": "slideDown",
+      "x": 85,
+      "y": 47,
+      "scale": 0.3649929706737745,
+      "rotate": -25,
+      "opacity": 0.20226144663306567
+    },
+    "mid": null,
+    "exit": {
+      "effect": "wave",
+      "x": 27,
+      "y": 78,
+      "scale": 1.4097153588719489,
+      "rotate": -38,
+      "opacity": 0.2693654504223072
+    },
+    "style": {
+      "color": "#FF6B6B",
+      "fontSize": 27,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 12,
+    "text": "Oh, no, he's not. ",
+    "start": 37.96,
+    "end": 39.487,
+    "duration": 1.527,
+    "entry": {
+      "effect": "wave",
+      "x": 87,
+      "y": 43,
+      "scale": 1.193375805606337,
+      "rotate": -2,
+      "opacity": 0.7080563413435859
+    },
+    "mid": {
+      "effect": "zoomIn",
+      "x": 60,
+      "y": 42,
+      "scale": 1.0024300884649118,
+      "rotate": -68,
+      "opacity": 0.9444307461258477
+    },
+    "exit": {
+      "effect": "wave",
+      "x": 23,
+      "y": 24,
+      "scale": 0.31357606295924095,
+      "rotate": -28,
+      "opacity": 0.752714926898921
+    },
+    "style": {
+      "color": "#FFA07A",
+      "fontSize": 59,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "0 0 28px #FFA07A"
+    }
+  },
+  {
+    "index": 13,
+    "text": "Where are my friends? Too loud. ",
+    "start": 39.52,
+    "end": 41.607,
+    "duration": 2.087,
+    "entry": {
+      "effect": "slideDown",
+      "x": 84,
+      "y": 43,
+      "scale": 0.6578504284007468,
+      "rotate": -31,
+      "opacity": 0.6472873095354564
+    },
+    "mid": {
+      "effect": "spin",
+      "x": 73,
+      "y": 52,
+      "scale": 1.62677358303274,
+      "rotate": 64,
+      "opacity": 0.5603510634355273
+    },
+    "exit": {
+      "effect": "zoomIn",
+      "x": 49,
+      "y": 80,
+      "scale": 1.441054744469909,
+      "rotate": -22,
+      "opacity": 0.4388549676763672
+    },
+    "style": {
+      "color": "#4ECDC4",
+      "fontSize": 58,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 30px #4ECDC4"
+    }
+  },
+  {
+    "index": 14,
+    "text": "You're too loud. Oh, Strawberry jam Philly. ",
+    "start": 41.64,
+    "end": 45.04,
+    "duration": 3.4,
+    "entry": {
+      "effect": "spin",
+      "x": 28,
+      "y": 56,
+      "scale": 0.7175700427285928,
+      "rotate": -22,
+      "opacity": 0.8955493234433927
+    },
+    "mid": {
+      "effect": "slideRight",
+      "x": 59,
+      "y": 52,
+      "scale": 0.5724480748807782,
+      "rotate": -41,
+      "opacity": 0.7516683726526125
+    },
+    "exit": {
+      "effect": "bounce",
+      "x": 34,
+      "y": 33,
+      "scale": 1.1458423968701974,
+      "rotate": 44,
+      "opacity": 0.8698862582749929
+    },
+    "style": {
+      "color": "#F7DC6F",
+      "fontSize": 35,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 15,
+    "text": "I got giant love in my heart in my heart in my heart in my heart ",
+    "start": 45.2,
+    "end": 49.84,
+    "duration": 4.64,
+    "entry": {
+      "effect": "fadeOut",
+      "x": 65,
+      "y": 64,
+      "scale": 0.34284214442764727,
+      "rotate": 9,
+      "opacity": 0.3438032346569122
+    },
+    "mid": null,
+    "exit": {
+      "effect": "explode",
+      "x": 34,
+      "y": 22,
+      "scale": 0.9059787163683759,
+      "rotate": -37,
+      "opacity": 0.7382053644693378
+    },
+    "style": {
+      "color": "#F8B500",
+      "fontSize": 69,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 16,
+    "text": "Big strong hands Sweaty palms, manic grin Riding these farts we're so ",
+    "start": 51.04,
+    "end": 57.567,
+    "duration": 6.527,
+    "entry": {
+      "effect": "explode",
+      "x": 85,
+      "y": 63,
+      "scale": 0.5031148168407404,
+      "rotate": 8,
+      "opacity": 0.7797035396919463
+    },
+    "mid": null,
+    "exit": {
+      "effect": "glitch",
+      "x": 55,
+      "y": 72,
+      "scale": 0.3010287543582251,
+      "rotate": -20,
+      "opacity": 0.4713024974453517
+    },
+    "style": {
+      "color": "#FFFFFF",
+      "fontSize": 66,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 21px #FFFFFF"
+    }
+  },
+  {
+    "index": 17,
+    "text": "small Loves our gold they can touch my micro. ",
+    "start": 57.767,
+    "end": 62.24,
+    "duration": 4.473,
+    "entry": {
+      "effect": "slideRight",
+      "x": 84,
+      "y": 70,
+      "scale": 0.9794524311303001,
+      "rotate": 9,
+      "opacity": 0.772795966356604
+    },
+    "mid": null,
+    "exit": {
+      "effect": "fadeIn",
+      "x": 81,
+      "y": 69,
+      "scale": 1.489730120361327,
+      "rotate": -42,
+      "opacity": 0.479354799677225
+    },
+    "style": {
+      "color": "#F7DC6F",
+      "fontSize": 47,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 26px #F7DC6F"
+    }
+  },
+  {
+    "index": 18,
+    "text": "Hello, Hello? ",
+    "start": 68.84,
+    "end": 69.933,
+    "duration": 1.093,
+    "entry": {
+      "effect": "shake",
+      "x": 30,
+      "y": 64,
+      "scale": 0.9999610025465455,
+      "rotate": 27,
+      "opacity": 0.529286455222471
+    },
+    "mid": null,
+    "exit": {
+      "effect": "slideLeft",
+      "x": 82,
+      "y": 50,
+      "scale": 0.6226921012961948,
+      "rotate": -38,
+      "opacity": 0.9466060939571301
+    },
+    "style": {
+      "color": "#F8B500",
+      "fontSize": 69,
+      "blur": 2,
+      "fontWeight": "bold",
+      "textShadow": "0 0 11px #F8B500"
+    }
+  },
+  {
+    "index": 19,
+    "text": "Maybe they're busy Coat on I go. ",
+    "start": 70.36,
+    "end": 73.167,
+    "duration": 2.807,
+    "entry": {
+      "effect": "slideRight",
+      "x": 40,
+      "y": 52,
+      "scale": 1.3356164156550894,
+      "rotate": 20,
+      "opacity": 0.9564054349509103
+    },
+    "mid": null,
+    "exit": {
+      "effect": "pulse",
+      "x": 34,
+      "y": 74,
+      "scale": 1.3247699028384219,
+      "rotate": -23,
+      "opacity": 0.63516563875312
+    },
+    "style": {
+      "color": "#F8B500",
+      "fontSize": 41,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 16px #F8B500"
+    }
+  },
+  {
+    "index": 20,
+    "text": "Outside Something big way out there Houses. ",
+    "start": 73.2,
+    "end": 77.727,
+    "duration": 4.527,
+    "entry": {
+      "effect": "shake",
+      "x": 42,
+      "y": 29,
+      "scale": 1.0505392738488997,
+      "rotate": 3,
+      "opacity": 0.7600310847596019
+    },
+    "mid": {
+      "effect": "shake",
+      "x": 34,
+      "y": 42,
+      "scale": 2.6830123143920046,
+      "rotate": -17,
+      "opacity": 0.5265754429529048
+    },
+    "exit": {
+      "effect": "zoomOut",
+      "x": 70,
+      "y": 61,
+      "scale": 0.4486472190147509,
+      "rotate": -18,
+      "opacity": 0.9983529336164405
+    },
+    "style": {
+      "color": "#4ECDC4",
+      "fontSize": 52,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 21,
+    "text": "Shape, cars go smash oh, another giant. ",
+    "start": 77.76,
+    "end": 80.487,
+    "duration": 2.727,
+    "entry": {
+      "effect": "slideRight",
+      "x": 88,
+      "y": 60,
+      "scale": 1.2538300139733585,
+      "rotate": 21,
+      "opacity": 0.8341637945397491
+    },
+    "mid": null,
+    "exit": {
+      "effect": "fadeIn",
+      "x": 46,
+      "y": 60,
+      "scale": 0.4175358796136192,
+      "rotate": 29,
+      "opacity": 0.6258597880751386
+    },
+    "style": {
+      "color": "#45B7D1",
+      "fontSize": 39,
+      "blur": 2,
+      "fontWeight": "normal",
+      "textShadow": "0 0 18px #45B7D1"
+    }
+  },
+  {
+    "index": 22,
+    "text": "He'S playing Friends go pop like balloon burst what's that smell? ",
+    "start": 80.52,
+    "end": 85.247,
+    "duration": 4.727,
+    "entry": {
+      "effect": "fadeOut",
+      "x": 71,
+      "y": 45,
+      "scale": 1.1780089084103302,
+      "rotate": -36,
+      "opacity": 0.3981895487131585
+    },
+    "mid": null,
+    "exit": {
+      "effect": "bounce",
+      "x": 62,
+      "y": 34,
+      "scale": 1.019809744795422,
+      "rotate": -12,
+      "opacity": 0.4065258866040024
+    },
+    "style": {
+      "color": "#45B7D1",
+      "fontSize": 43,
+      "blur": 4,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 23,
+    "text": "Red liquid spurt Mine goes dim Room starts ",
+    "start": 85.28,
+    "end": 88.887,
+    "duration": 3.607,
+    "entry": {
+      "effect": "spin",
+      "x": 14,
+      "y": 54,
+      "scale": 0.6746380895507034,
+      "rotate": 18,
+      "opacity": 0.2294640266187381
+    },
+    "mid": null,
+    "exit": {
+      "effect": "shrink",
+      "x": 56,
+      "y": 68,
+      "scale": 0.692395680180571,
+      "rotate": -7,
+      "opacity": 0.9733940848882348
+    },
+    "style": {
+      "color": "#85C1E2",
+      "fontSize": 35,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 24,
+    "text": "to spin we back again the big man thin I ",
+    "start": 88.92,
+    "end": 92.607,
+    "duration": 3.687,
+    "entry": {
+      "effect": "bounce",
+      "x": 28,
+      "y": 48,
+      "scale": 1.2119110121000711,
+      "rotate": 1,
+      "opacity": 0.5073058638386394
+    },
+    "mid": {
+      "effect": "zoomIn",
+      "x": 33,
+      "y": 49,
+      "scale": 0.8982403248922062,
+      "rotate": 15,
+      "opacity": 0.8250073576960926
+    },
+    "exit": {
+      "effect": "fadeOut",
+      "x": 81,
+      "y": 27,
+      "scale": 1.3167067334017717,
+      "rotate": -11,
+      "opacity": 0.5830886597394003
+    },
+    "style": {
+      "color": "#4ECDC4",
+      "fontSize": 38,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 25,
+    "text": "got monster love in my heart in my heart in my heart in my heart in my heart ",
+    "start": 92.64,
+    "end": 97.56,
+    "duration": 4.92,
+    "entry": {
+      "effect": "zoomOut",
+      "x": 20,
+      "y": 57,
+      "scale": 1.0139657254463847,
+      "rotate": -18,
+      "opacity": 0.6466324590171664
+    },
+    "mid": {
+      "effect": "bounce",
+      "x": 72,
+      "y": 54,
+      "scale": 2.3613462370712814,
+      "rotate": 29,
+      "opacity": 0.9401210965085253
+    },
+    "exit": {
+      "effect": "explode",
+      "x": 11,
+      "y": 62,
+      "scale": 1.2016623831720203,
+      "rotate": 33,
+      "opacity": 0.8007532773629369
+    },
+    "style": {
+      "color": "#FFA07A",
+      "fontSize": 67,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 26,
+    "text": "Big man plays Tickles my friends Stomps ",
+    "start": 98.76,
+    "end": 102.207,
+    "duration": 3.447,
+    "entry": {
+      "effect": "zoomOut",
+      "x": 29,
+      "y": 61,
+      "scale": 0.6560239830948735,
+      "rotate": 11,
+      "opacity": 0.61049341646646
+    },
+    "mid": null,
+    "exit": {
+      "effect": "spin",
+      "x": 32,
+      "y": 22,
+      "scale": 0.7679523358913447,
+      "rotate": 27,
+      "opacity": 0.7970521544894049
+    },
+    "style": {
+      "color": "#45B7D1",
+      "fontSize": 24,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 25px #45B7D1"
+    }
+  },
+  {
+    "index": 27,
+    "text": "around, spins my head Dirty mess he always ",
+    "start": 102.24,
+    "end": 106.68,
+    "duration": 4.44,
+    "entry": {
+      "effect": "explode",
+      "x": 80,
+      "y": 40,
+      "scale": 0.3701596312616072,
+      "rotate": -32,
+      "opacity": 0.3898441570272539
+    },
+    "mid": {
+      "effect": "bounce",
+      "x": 78,
+      "y": 37,
+      "scale": 0.9188909534789573,
+      "rotate": -43,
+      "opacity": 0.8275303548179018
+    },
+    "exit": {
+      "effect": "explode",
+      "x": 68,
+      "y": 75,
+      "scale": 1.0884569474417125,
+      "rotate": -37,
+      "opacity": 0.8297311138155734
+    },
+    "style": {
+      "color": "#BB8FCE",
+      "fontSize": 42,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 16px #BB8FCE"
+    }
+  },
+  {
+    "index": 28,
+    "text": "leaves Buzzing flies and broken trees Whiskey bottles broke on the ground ",
+    "start": 106.92,
+    "end": 113.24,
+    "duration": 6.32,
+    "entry": {
+      "effect": "slideUp",
+      "x": 10,
+      "y": 60,
+      "scale": 0.7135870566489326,
+      "rotate": 36,
+      "opacity": 0.7171134165241644
+    },
+    "mid": null,
+    "exit": {
+      "effect": "slideRight",
+      "x": 77,
+      "y": 57,
+      "scale": 0.9561390270116994,
+      "rotate": 37,
+      "opacity": 0.6683290086964657
+    },
+    "style": {
+      "color": "#F7DC6F",
+      "fontSize": 61,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "0 0 17px #F7DC6F"
+    }
+  },
+  {
+    "index": 29,
+    "text": "the size of mediocre house up so high Wind ",
+    "start": 113.4,
+    "end": 118.327,
+    "duration": 4.927,
+    "entry": {
+      "effect": "fadeIn",
+      "x": 87,
+      "y": 43,
+      "scale": 0.7089318126218416,
+      "rotate": -43,
+      "opacity": 0.7318259141838821
+    },
+    "mid": null,
+    "exit": {
+      "effect": "shrink",
+      "x": 72,
+      "y": 26,
+      "scale": 0.4344885113633974,
+      "rotate": -16,
+      "opacity": 0.47382331372341735
+    },
+    "style": {
+      "color": "#4ECDC4",
+      "fontSize": 25,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 30,
+    "text": "screams loud Cities end so far down Whoa. ",
+    "start": 118.36,
+    "end": 125.32,
+    "duration": 6.96,
+    "entry": {
+      "effect": "slideUp",
+      "x": 37,
+      "y": 39,
+      "scale": 1.261128032695666,
+      "rotate": -43,
+      "opacity": 0.3569947849736752
+    },
+    "mid": {
+      "effect": "slideUp",
+      "x": 76,
+      "y": 50,
+      "scale": 1.6818045273622577,
+      "rotate": -62,
+      "opacity": 0.5454050838293057
+    },
+    "exit": {
+      "effect": "fadeOut",
+      "x": 42,
+      "y": 35,
+      "scale": 1.1065240994107914,
+      "rotate": 24,
+      "opacity": 0.7094290278941628
+    },
+    "style": {
+      "color": "#F7DC6F",
+      "fontSize": 56,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 10px #F7DC6F"
+    }
+  },
+  {
+    "index": 31,
+    "text": "Hey, G. We're friends. ",
+    "start": 126.517,
+    "end": 128.24,
+    "duration": 1.723,
+    "entry": {
+      "effect": "slideRight",
+      "x": 56,
+      "y": 71,
+      "scale": 0.6919694843457338,
+      "rotate": -5,
+      "opacity": 0.9683054028942941
+    },
+    "mid": null,
+    "exit": {
+      "effect": "fadeIn",
+      "x": 42,
+      "y": 46,
+      "scale": 1.0788449307411991,
+      "rotate": -33,
+      "opacity": 0.6638731881038593
+    },
+    "style": {
+      "color": "#F8B500",
+      "fontSize": 64,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 32,
+    "text": "He laughs Clouds split It's blood, not jam I see it now falling fast. ",
+    "start": 129.76,
+    "end": 135.607,
+    "duration": 5.847,
+    "entry": {
+      "effect": "fadeOut",
+      "x": 37,
+      "y": 65,
+      "scale": 0.36168856548605693,
+      "rotate": -30,
+      "opacity": 0.5861267282795084
+    },
+    "mid": {
+      "effect": "explode",
+      "x": 56,
+      "y": 43,
+      "scale": 0.7076091972519339,
+      "rotate": 20,
+      "opacity": 0.6662802647387539
+    },
+    "exit": {
+      "effect": "wave",
+      "x": 60,
+      "y": 67,
+      "scale": 0.4427294288392587,
+      "rotate": 25,
+      "opacity": 0.39800701809802386
+    },
+    "style": {
+      "color": "#4ECDC4",
+      "fontSize": 52,
+      "blur": 5,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 33,
+    "text": "Wind rips my dress Clouds and roofs and bricks no less I got giant love ",
+    "start": 135.64,
+    "end": 141.527,
+    "duration": 5.887,
+    "entry": {
+      "effect": "zoomIn",
+      "x": 76,
+      "y": 39,
+      "scale": 0.3534447340143,
+      "rotate": 36,
+      "opacity": 0.6103995402233187
+    },
+    "mid": {
+      "effect": "fadeOut",
+      "x": 71,
+      "y": 35,
+      "scale": 1.2108849171222826,
+      "rotate": -76,
+      "opacity": 0.8182203168147975
+    },
+    "exit": {
+      "effect": "zoomOut",
+      "x": 48,
+      "y": 63,
+      "scale": 0.6147312644134868,
+      "rotate": 33,
+      "opacity": 0.5419562625978287
+    },
+    "style": {
+      "color": "#BB8FCE",
+      "fontSize": 54,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "0 0 12px #BB8FCE"
+    }
+  },
+  {
+    "index": 34,
+    "text": "in my heart in my heart ",
+    "start": 141.56,
+    "end": 143.12,
+    "duration": 1.56,
+    "entry": {
+      "effect": "wave",
+      "x": 90,
+      "y": 37,
+      "scale": 0.7431563106056719,
+      "rotate": 0,
+      "opacity": 0.8773242784112882
+    },
+    "mid": null,
+    "exit": {
+      "effect": "glitch",
+      "x": 77,
+      "y": 61,
+      "scale": 0.47831842708268224,
+      "rotate": -40,
+      "opacity": 0.2513792954559259
+    },
+    "style": {
+      "color": "#45B7D1",
+      "fontSize": 65,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "0 0 22px #45B7D1"
+    }
+  },
+  {
+    "index": 35,
+    "text": "maybe I should have stayed in J okay. ",
+    "start": 143.52,
+    "end": 148.967,
+    "duration": 5.447,
+    "entry": {
+      "effect": "shrink",
+      "x": 58,
+      "y": 30,
+      "scale": 0.44068192592596467,
+      "rotate": -19,
+      "opacity": 0.8267379318420469
+    },
+    "mid": {
+      "effect": "slideLeft",
+      "x": 48,
+      "y": 62,
+      "scale": 1.129355466792132,
+      "rotate": -82,
+      "opacity": 0.7188817105629539
+    },
+    "exit": {
+      "effect": "slideUp",
+      "x": 27,
+      "y": 72,
+      "scale": 1.4762003864797453,
+      "rotate": -44,
+      "opacity": 0.6617857140870707
+    },
+    "style": {
+      "color": "#45B7D1",
+      "fontSize": 29,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "0 0 22px #45B7D1"
+    }
+  },
+  {
+    "index": 36,
+    "text": "I got dying love in my heart in my heart, in my heart in my heart in my heart, ",
+    "start": 149,
+    "end": 154.24,
+    "duration": 5.24,
+    "entry": {
+      "effect": "slideUp",
+      "x": 24,
+      "y": 45,
+      "scale": 1.382315413494711,
+      "rotate": 42,
+      "opacity": 0.7721122111978405
+    },
+    "mid": null,
+    "exit": {
+      "effect": "slideRight",
+      "x": 60,
+      "y": 43,
+      "scale": 0.5016704632996279,
+      "rotate": -33,
+      "opacity": 0.4719059867333525
+    },
+    "style": {
+      "color": "#BB8FCE",
+      "fontSize": 35,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 37,
+    "text": "my heart Big strong hands Sweaty palms ",
+    "start": 154.32,
+    "end": 158.16,
+    "duration": 3.84,
+    "entry": {
+      "effect": "slideUp",
+      "x": 72,
+      "y": 38,
+      "scale": 0.5516395983925007,
+      "rotate": 43,
+      "opacity": 0.9430197314668647
+    },
+    "mid": {
+      "effect": "zoomOut",
+      "x": 77,
+      "y": 49,
+      "scale": 1.8820793032894187,
+      "rotate": -98,
+      "opacity": 0.8597073763057175
+    },
+    "exit": {
+      "effect": "zoomIn",
+      "x": 39,
+      "y": 28,
+      "scale": 1.2214524489259082,
+      "rotate": -22,
+      "opacity": 0.7941894926037227
+    },
+    "style": {
+      "color": "#85C1E2",
+      "fontSize": 66,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "0 0 10px #85C1E2"
+    }
+  },
+  {
+    "index": 38,
+    "text": "Manic grin Riding meat bars we're so small ",
+    "start": 158.32,
+    "end": 162.32,
+    "duration": 4,
+    "entry": {
+      "effect": "fadeOut",
+      "x": 32,
+      "y": 79,
+      "scale": 0.6292146126213949,
+      "rotate": 27,
+      "opacity": 0.5078443458529722
+    },
+    "mid": null,
+    "exit": {
+      "effect": "pulse",
+      "x": 31,
+      "y": 78,
+      "scale": 1.439186170577002,
+      "rotate": 37,
+      "opacity": 0.7458068914655358
+    },
+    "style": {
+      "color": "#F8B500",
+      "fontSize": 64,
+      "blur": 5,
+      "fontWeight": "bold",
+      "textShadow": "0 0 26px #F8B500"
+    }
+  },
+  {
+    "index": 39,
+    "text": "Loves are gold they can touch my micro Holy Friends go pop like ",
+    "start": 162.8,
+    "end": 169.007,
+    "duration": 6.207,
+    "entry": {
+      "effect": "fadeOut",
+      "x": 49,
+      "y": 71,
+      "scale": 0.818639259116982,
+      "rotate": -7,
+      "opacity": 0.9048744810647193
+    },
+    "mid": {
+      "effect": "shake",
+      "x": 75,
+      "y": 49,
+      "scale": 0.8234615310412142,
+      "rotate": 119,
+      "opacity": 0.9952405417261398
+    },
+    "exit": {
+      "effect": "slideRight",
+      "x": 78,
+      "y": 51,
+      "scale": 0.5668233584670541,
+      "rotate": 8,
+      "opacity": 0.6119364380118064
+    },
+    "style": {
+      "color": "#F7DC6F",
+      "fontSize": 43,
+      "blur": 3,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 40,
+    "text": "balloon birds what's that smell? ",
+    "start": 169.04,
+    "end": 171.367,
+    "duration": 2.327,
+    "entry": {
+      "effect": "slideUp",
+      "x": 88,
+      "y": 61,
+      "scale": 0.4509077607757632,
+      "rotate": -18,
+      "opacity": 0.6381532457442476
+    },
+    "mid": {
+      "effect": "slideUp",
+      "x": 39,
+      "y": 61,
+      "scale": 0.9826890019461636,
+      "rotate": -18,
+      "opacity": 0.7419590837715765
+    },
+    "exit": {
+      "effect": "zoomOut",
+      "x": 11,
+      "y": 55,
+      "scale": 1.0262083834160916,
+      "rotate": -26,
+      "opacity": 0.8727913024324587
+    },
+    "style": {
+      "color": "#4ECDC4",
+      "fontSize": 33,
+      "blur": 4,
+      "fontWeight": "bold",
+      "textShadow": "0 0 19px #4ECDC4"
+    }
+  },
+  {
+    "index": 41,
+    "text": "Red liquid spurts Mine goes in Room starts ",
+    "start": 171.4,
+    "end": 175.25,
+    "duration": 3.85,
+    "entry": {
+      "effect": "explode",
+      "x": 52,
+      "y": 76,
+      "scale": 0.4934142653732776,
+      "rotate": 15,
+      "opacity": 0.856049642187358
+    },
+    "mid": {
+      "effect": "bounce",
+      "x": 41,
+      "y": 61,
+      "scale": 2.961884334965296,
+      "rotate": -12,
+      "opacity": 0.6168866949179428
+    },
+    "exit": {
+      "effect": "fadeOut",
+      "x": 32,
+      "y": 71,
+      "scale": 0.5174125644753309,
+      "rotate": 22,
+      "opacity": 0.6273754488529977
+    },
+    "style": {
+      "color": "#F8B500",
+      "fontSize": 64,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 42,
+    "text": "to spin we back again the big man sp. ",
+    "start": 175.45,
+    "end": 178.72,
+    "duration": 3.27,
+    "entry": {
+      "effect": "shake",
+      "x": 56,
+      "y": 21,
+      "scale": 0.3685442957216467,
+      "rotate": 43,
+      "opacity": 0.8414981558238877
+    },
+    "mid": {
+      "effect": "bounce",
+      "x": 26,
+      "y": 44,
+      "scale": 2.5560209774561087,
+      "rotate": 122,
+      "opacity": 0.7675186353531596
+    },
+    "exit": {
+      "effect": "glitch",
+      "x": 15,
+      "y": 37,
+      "scale": 0.6839756805371505,
+      "rotate": 14,
+      "opacity": 0.2752999654607548
+    },
+    "style": {
+      "color": "#FF6B6B",
+      "fontSize": 51,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 43,
+    "text": "I got monster love in my heart in my heart, in my heart in my heart, ",
+    "start": 184.72,
+    "end": 189.133,
+    "duration": 4.413,
+    "entry": {
+      "effect": "explode",
+      "x": 60,
+      "y": 55,
+      "scale": 1.441213131364637,
+      "rotate": -8,
+      "opacity": 0.6483809437954587
+    },
+    "mid": {
+      "effect": "slideUp",
+      "x": 50,
+      "y": 56,
+      "scale": 2.254393289516888,
+      "rotate": 18,
+      "opacity": 0.6724516236913319
+    },
+    "exit": {
+      "effect": "glitch",
+      "x": 69,
+      "y": 37,
+      "scale": 1.1869342792198523,
+      "rotate": 42,
+      "opacity": 0.9597082272811259
+    },
+    "style": {
+      "color": "#BB8FCE",
+      "fontSize": 35,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 44,
+    "text": "in my heart man plays Tickles my friends Stomps around ",
+    "start": 189.333,
+    "end": 194.92,
+    "duration": 5.587,
+    "entry": {
+      "effect": "slideDown",
+      "x": 75,
+      "y": 78,
+      "scale": 0.8636905792895078,
+      "rotate": 19,
+      "opacity": 0.42267273771378433
+    },
+    "mid": {
+      "effect": "zoomIn",
+      "x": 68,
+      "y": 61,
+      "scale": 1.43265093133639,
+      "rotate": -90,
+      "opacity": 0.9849541274508948
+    },
+    "exit": {
+      "effect": "slideUp",
+      "x": 62,
+      "y": 27,
+      "scale": 1.164531415524151,
+      "rotate": 9,
+      "opacity": 0.6010652778170554
+    },
+    "style": {
+      "color": "#BB8FCE",
+      "fontSize": 38,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 45,
+    "text": "Spins my head Dirty mess he always leaves Buzzing. ",
+    "start": 195.32,
+    "end": 200.687,
+    "duration": 5.367,
+    "entry": {
+      "effect": "slideDown",
+      "x": 54,
+      "y": 54,
+      "scale": 0.9622487039627983,
+      "rotate": 11,
+      "opacity": 0.7710285811394963
+    },
+    "mid": null,
+    "exit": {
+      "effect": "slideRight",
+      "x": 83,
+      "y": 57,
+      "scale": 1.179325996137061,
+      "rotate": -24,
+      "opacity": 0.6734179682723798
+    },
+    "style": {
+      "color": "#98D8C8",
+      "fontSize": 61,
+      "blur": 0,
+      "fontWeight": "bold",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 46,
+    "text": "Flies and broken trees Whiskey bottles poking on the ground the size ",
+    "start": 200.72,
+    "end": 206.68,
+    "duration": 5.96,
+    "entry": {
+      "effect": "glitch",
+      "x": 43,
+      "y": 20,
+      "scale": 0.43194202333000087,
+      "rotate": -1,
+      "opacity": 0.7923504269099388
+    },
+    "mid": {
+      "effect": "spin",
+      "x": 56,
+      "y": 70,
+      "scale": 0.7754065780903578,
+      "rotate": 141,
+      "opacity": 0.6431482293263401
+    },
+    "exit": {
+      "effect": "glitch",
+      "x": 64,
+      "y": 27,
+      "scale": 0.5301019465571841,
+      "rotate": -26,
+      "opacity": 0.6043933352928309
+    },
+    "style": {
+      "color": "#FF6B6B",
+      "fontSize": 42,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 47,
+    "text": "of mediocre house. ",
+    "start": 207.64,
+    "end": 209.48,
+    "duration": 1.84,
+    "entry": {
+      "effect": "spin",
+      "x": 29,
+      "y": 34,
+      "scale": 1.1325183163231718,
+      "rotate": 32,
+      "opacity": 0.5831642448219272
+    },
+    "mid": null,
+    "exit": {
+      "effect": "spin",
+      "x": 24,
+      "y": 37,
+      "scale": 0.3715633219545746,
+      "rotate": 2,
+      "opacity": 0.43593443188376874
+    },
+    "style": {
+      "color": "#4ECDC4",
+      "fontSize": 53,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "none"
+    }
+  },
+  {
+    "index": 48,
+    "text": "Of mediocre. ",
+    "start": 213.56,
+    "end": 218.2,
+    "duration": 4.64,
+    "entry": {
+      "effect": "slideUp",
+      "x": 24,
+      "y": 28,
+      "scale": 0.5660984121362265,
+      "rotate": 10,
+      "opacity": 0.398494700446319
+    },
+    "mid": null,
+    "exit": {
+      "effect": "slideUp",
+      "x": 82,
+      "y": 43,
+      "scale": 0.5979453045038077,
+      "rotate": -32,
+      "opacity": 0.698614778555191
+    },
+    "style": {
+      "color": "#F8B500",
+      "fontSize": 39,
+      "blur": 0,
+      "fontWeight": "normal",
+      "textShadow": "0 0 29px #F8B500"
+    }
+  }
+];
+
+console.log(`🎬 Loaded ${animations.length} wild animations!`);
+
+const stage = document.getElementById('animation-stage');
+const playBtn = document.getElementById('playBtn');
+const restartBtn = document.getElementById('restartBtn');
+const timeline = document.getElementById('timeline');
+const video = document.getElementById('videoPlayer');
+
+// Start video at 15 seconds where subtitles begin
+video.addEventListener('loadedmetadata', () => {
+  video.currentTime = 15;
+  console.log('📍 Video ready - starting at 15s where subtitles begin');
+});
+
+// Animation effect implementations
+const effectFunctions = {
+  zoomIn: (el, progress) => {
+    const scale = 0.3 + (progress * 0.7);
+    el.style.transform += ` scale(${scale})`;
+  },
+
+  zoomOut: (el, progress) => {
+    const scale = 1 + (progress * 2);
+    el.style.transform += ` scale(${scale})`;
+  },
+
+  slideUp: (el, progress) => {
+    const y = 100 - (progress * 100);
+    el.style.transform += ` translateY(${y}%)`;
+  },
+
+  slideDown: (el, progress) => {
+    const y = -100 + (progress * 100);
+    el.style.transform += ` translateY(${y}%)`;
+  },
+
+  slideLeft: (el, progress) => {
+    const x = 100 - (progress * 100);
+    el.style.transform += ` translateX(${x}%)`;
+  },
+
+  slideRight: (el, progress) => {
+    const x = -100 + (progress * 100);
+    el.style.transform += ` translateX(${x}%)`;
+  },
+
+  fadeIn: (el, progress) => {
+    el.style.opacity = progress;
+  },
+
+  fadeOut: (el, progress) => {
+    el.style.opacity = 1 - progress;
+  },
+
+  spin: (el, progress) => {
+    const rotation = progress * 360;
+    el.style.transform += ` rotate(${rotation}deg)`;
+  },
+
+  bounce: (el, progress) => {
+    const bounce = Math.abs(Math.sin(progress * Math.PI * 3)) * 50;
+    el.style.transform += ` translateY(-${bounce}px)`;
+  },
+
+  explode: (el, progress) => {
+    const scale = 1 + (progress * 3);
+    const opacity = 1 - progress;
+    el.style.transform += ` scale(${scale})`;
+    el.style.opacity = opacity;
+  },
+
+  shrink: (el, progress) => {
+    const scale = 1 - (progress * 0.8);
+    el.style.transform += ` scale(${scale})`;
+  },
+
+  pulse: (el, progress) => {
+    const scale = 1 + Math.sin(progress * Math.PI * 4) * 0.2;
+    el.style.transform += ` scale(${scale})`;
+  },
+
+  glitch: (el, progress) => {
+    if (Math.random() > 0.8) {
+      const x = (Math.random() - 0.5) * 20;
+      const y = (Math.random() - 0.5) * 20;
+      el.style.transform += ` translate(${x}px, ${y}px)`;
+    }
+  },
+
+  wave: (el, progress) => {
+    const y = Math.sin(progress * Math.PI * 2) * 30;
+    el.style.transform += ` translateY(${y}px)`;
+  },
+
+  shake: (el, progress) => {
+    const x = Math.sin(progress * Math.PI * 10) * 15;
+    el.style.transform += ` translateX(${x}px)`;
+  }
+};
+
+function animate(timestamp) {
+  if (!startTime) {
+    startTime = timestamp - 15000; // Start at 15 seconds
+  }
+  currentTime = (timestamp - startTime) / 1000;
+
+  // Update timeline
+  const mins = Math.floor(currentTime / 60);
+  const secs = Math.floor(currentTime % 60);
+  timeline.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+  // Clear stage
+  stage.innerHTML = '';
+
+  // Render active subtitles
+  let activeCount = 0;
+  animations.forEach(anim => {
+    if (currentTime >= anim.start && currentTime <= anim.end) {
+      activeCount++;
+      const progress = (currentTime - anim.start) / anim.duration;
+      const el = document.createElement('div');
+      el.className = 'subtitle-text';
+      el.textContent = anim.text;
+
+      // Apply base styles
+      el.style.color = anim.style.color;
+      el.style.fontSize = anim.style.fontSize + 'px';
+      el.style.fontWeight = anim.style.fontWeight;
+      el.style.textShadow = anim.style.textShadow;
+      if (anim.style.blur > 0) {
+        el.style.filter = `blur(${anim.style.blur}px)`;
+      }
+
+      // Determine animation phase
+      let currentAnim, animProgress;
+      if (progress < 0.3) {
+        // Entry phase
+        currentAnim = anim.entry;
+        animProgress = progress / 0.3;
+      } else if (progress < 0.7 && anim.mid) {
+        // Mid phase
+        currentAnim = anim.mid;
+        animProgress = (progress - 0.3) / 0.4;
+      } else {
+        // Exit phase
+        currentAnim = anim.exit;
+        animProgress = (progress - 0.7) / 0.3;
+      }
+
+      // Apply position
+      el.style.left = currentAnim.x + '%';
+      el.style.top = currentAnim.y + '%';
+      el.style.transform = `translate(-50%, -50%)`;
+
+      // Apply base transformations
+      el.style.transform += ` scale(${currentAnim.scale}) rotate(${currentAnim.rotate}deg)`;
+      el.style.opacity = currentAnim.opacity;
+
+      // Apply effect
+      const effectFn = effectFunctions[currentAnim.effect];
+      if (effectFn) {
+        effectFn(el, animProgress);
+      }
+
+      stage.appendChild(el);
+    }
+  });
+
+  if (activeCount > 0 && Math.floor(currentTime) % 2 === 0) {
+    console.log(`Active subtitles: ${activeCount} at time ${currentTime.toFixed(2)}s`);
+  }
+
+  if (isPlaying) {
+    animationFrame = requestAnimationFrame(animate);
+  }
+}
+
+playBtn.addEventListener('click', () => {
+  if (isPlaying) {
+    isPlaying = false;
+    playBtn.textContent = '▶️ PLAY';
+    cancelAnimationFrame(animationFrame);
+    video.pause();
+  } else {
+    isPlaying = true;
+    playBtn.textContent = '⏸️ PAUSE';
+    if (!startTime) startTime = performance.now() - (currentTime * 1000);
+    video.play();
+    animationFrame = requestAnimationFrame(animate);
+  }
+});
+
+restartBtn.addEventListener('click', () => {
+  currentTime = 15;
+  startTime = null;
+  isPlaying = false;
+  playBtn.textContent = '▶️ PLAY';
+  cancelAnimationFrame(animationFrame);
+  video.pause();
+  video.currentTime = 15;
+  stage.innerHTML = '';
+  timeline.textContent = '0:15';
+});
+
+console.log('🚀 Player ready! Click PLAY to see the wild animations!');
+</script>
+</body>
+</html>

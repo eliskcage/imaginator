@@ -1,0 +1,47 @@
+# ===== SECRETS (CRITICAL — NEVER COMMIT) =====
+secrets.php
+.env
+*.secret
+*.key
+*.pem
+
+# ===== BACKUP / DEPLOY COPIES =====
+*copycopy*
+*_backup*
+*_old.*
+
+# ===== VIDEO / MEDIA ASSETS (too large) =====
+letter_assets/
+background_videos/
+masked_letters/
+letter_masks/
+uploads/
+frames/
+stills/
+*.mp4
+*.webm
+*.wav
+*.mp3
+
+# ===== NODE =====
+node_modules/
+package-lock.json
+
+# ===== LOGS =====
+*.log
+npm-debug.log*
+
+# ===== OS FILES =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== PHP DEPS =====
+stripe-php*/
+vendor/
+
+# ===== TEMP / CACHE =====
+*.tmp
+*.swp
+*.bak
+/tmp/

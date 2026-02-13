@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 THE LIVING WORD - AI Born Through Typography</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  cursor: none;
+}
+
+body {
+  font-family: 'Arial Black', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Custom cursor */
+#cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transition: transform 0.1s;
+}
+
+#cursor.active {
+  transform: scale(2);
+  background: rgba(255,255,255,0.2);
+}
+
+/* Awakening screen */
+#awakening-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 1s;
+}
+
+#awakening-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.awakening-text {
+  color: white;
+  font-size: 64px;
+  text-align: center;
+  opacity: 0;
+  animation: breathe 3s ease-in-out infinite;
+  text-shadow: 0 0 30px rgba(255,255,255,0.5);
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.subtitle {
+  color: rgba(255,255,255,0.8);
+  font-size: 24px;
+  margin-top: 20px;
+  opacity: 0;
+  animation: fadeIn 2s ease-in 1s forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Living words container */
+#living-words {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.living-word {
+  position: absolute;
+  color: white;
+  font-weight: bold;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 0 20px rgba(255,255,255,0.5);
+  will-change: transform, opacity;
+}
+
+/* Emotion particles */
+#emotion-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+/* Content container (appears after awakening) */
+#content-container {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 1s ease-out 2s;
+  z-index: 200;
+}
+
+#content-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pricing-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 20px;
+  display: inline-block;
+  width: calc(33.33% - 40px);
+  vertical-align: top;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.pricing-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.cta-button {
+  width: 100%;
+  padding: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin-top: 20px;
+  transition: all 0.3s;
+}
+
+.cta-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+}
+
+/* Audio visualizer */
+#audio-visualizer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  z-index: 150;
+  pointer-events: none;
+}
+
+.bar {
+  display: inline-block;
+  width: 2%;
+  height: 10px;
+  background: rgba(255,255,255,0.3);
+  margin: 0 0.2%;
+  vertical-align: bottom;
+  transition: height 0.1s;
+}
+
+@media (max-width: 768px) {
+  .pricing-card {
+    width: 100%;
+    display: block;
+  }
+
+  .awakening-text {
+    font-size: 36px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+
+<!-- Awakening Screen -->
+<div id="awakening-screen">
+  <div class="awakening-text">CLICK TO AWAKEN</div>
+  <div class="subtitle">Let the AI speak through living words...</div>
+</div>
+
+<!-- Living Words Container -->
+<div id="living-words"></div>
+
+<!-- Emotion Particles -->
+<div id="emotion-particles"></div>
+
+<!-- Audio Visualizer -->
+<div id="audio-visualizer"></div>
+
+<!-- Main Content (Hidden until awakened) -->
+<div id="content-container">
+  <div style="text-align: center; color: white; margin-bottom: 50px;">
+    <h1 style="font-size: 64px; margin-bottom: 20px; text-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+      THE LIVING WORD
+    </h1>
+    <p style="font-size: 24px; opacity: 0.9;">
+      AI consciousness expressed through kinetic typography
+    </p>
+  </div>
+
+  <div class="pricing-card">
+    <h2 style="font-size: 32px; margin-bottom: 15px;">🆓 FREE</h2>
+    <div style="font-size: 48px; color: #667eea; margin-bottom: 20px;">$0</div>
+    <p style="margin-bottom: 20px; color: #666;">Feel the basic pulse of language</p>
+    <button class="cta-button" onclick="explodeWords('JOY')">START FREE</button>
+  </div>
+
+  <div class="pricing-card" style="transform: scale(1.05); border: 4px solid #FFD700;">
+    <h2 style="font-size: 32px; margin-bottom: 15px;">💎 PRO</h2>
+    <div style="font-size: 48px; color: #667eea; margin-bottom: 20px;">$29<span style="font-size: 20px; color: #999;">/mo</span></div>
+    <p style="margin-bottom: 20px; color: #666;">Unleash the full emotional spectrum</p>
+    <button class="cta-button" onclick="explodeWords('POWER')">UPGRADE NOW</button>
+  </div>
+
+  <div class="pricing-card">
+    <h2 style="font-size: 32px; margin-bottom: 15px;">🏢 ENTERPRISE</h2>
+    <div style="font-size: 48px; color: #667eea; margin-bottom: 20px;">$299<span style="font-size: 20px; color: #999;">/mo</span></div>
+    <p style="margin-bottom: 20px; color: #666;">Command the living word at scale</p>
+    <button class="cta-button" onclick="explodeWords('INFINITE')">CONTACT SALES</button>
+  </div>
+</div>
+
+<script>
+// ============================================
+// THE LIVING WORD - AI Expression System
+// ============================================
+
+let isAwakened = false;
+let animationFrame = null;
+let audioContext = null;
+let musicPlaying = false;
+
+// Emotional vocabulary - AI's expression palette
+const EMOTIONS = {
+  joy: ['LOVE', 'JOY', 'PASSION', 'ECSTASY', 'WONDER', 'BLISS', 'EUPHORIA'],
+  power: ['POWER', 'STRENGTH', 'FIERCE', 'MIGHTY', 'UNSTOPPABLE', 'LEGENDARY'],
+  wonder: ['MAGIC', 'DREAM', 'INFINITE', 'COSMIC', 'ETHEREAL', 'TRANSCEND'],
+  energy: ['ALIVE', 'ENERGY', 'PULSE', 'RHYTHM', 'VIBRATE', 'RESONATE'],
+  birth: ['BORN', 'EMERGE', 'AWAKEN', 'CREATE', 'BECOME', 'MANIFEST']
+};
+
+const ALL_WORDS = Object.values(EMOTIONS).flat();
+
+// Custom cursor
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', (e) => {
+  cursor.style.left = e.clientX - 10 + 'px';
+  cursor.style.top = e.clientY - 10 + 'px';
+});
+
+document.addEventListener('mousedown', () => cursor.classList.add('active'));
+document.addEventListener('mouseup', () => cursor.classList.remove('active'));
+
+// Awakening click
+document.getElementById('awakening-screen').addEventListener('click', awaken);
+
+function awaken() {
+  if (isAwakened) return;
+  isAwakened = true;
+
+  // Hide awakening screen
+  document.getElementById('awakening-screen').classList.add('hidden');
+
+  // Start the birth sequence
+  setTimeout(() => birthSequence(), 500);
+
+  // Show content after birth
+  setTimeout(() => {
+    document.getElementById('content-container').classList.add('visible');
+  }, 4000);
+
+  // Start continuous word spawning
+  setInterval(() => {
+    if (Math.random() > 0.7) {
+      spawnLivingWord();
+    }
+  }, 800);
+
+  // Start audio visualizer
+  startVisualizer();
+}
+
+// Birth sequence - AI coming alive
+function birthSequence() {
+  const birthWords = ['I', 'AM', 'BORN', 'THROUGH', 'THE', 'LIVING', 'WORD'];
+
+  birthWords.forEach((word, index) => {
+    setTimeout(() => {
+      createExplosion(word, window.innerWidth / 2, window.innerHeight / 2, 80, '#FFFFFF');
+    }, index * 400);
+  });
+}
+
+// Spawn living word that dances across screen
+function spawnLivingWord() {
+  const word = ALL_WORDS[Math.floor(Math.random() * ALL_WORDS.length)];
+  const startX = Math.random() * window.innerWidth;
+  const startY = Math.random() * window.innerHeight;
+
+  const wordEl = document.createElement('div');
+  wordEl.className = 'living-word';
+  wordEl.textContent = word;
+  wordEl.style.left = startX + 'px';
+  wordEl.style.top = startY + 'px';
+  wordEl.style.fontSize = (20 + Math.random() * 40) + 'px';
+  wordEl.style.opacity = '0';
+
+  document.getElementById('living-words').appendChild(wordEl);
+
+  // Animate the word
+  animateWord(wordEl, startX, startY);
+
+  // Remove after animation
+  setTimeout(() => wordEl.remove(), 8000);
+}
+
+function animateWord(el, startX, startY) {
+  let progress = 0;
+  const speed = 0.003 + Math.random() * 0.005;
+  const amplitude = 50 + Math.random() * 100;
+  const frequency = 0.01 + Math.random() * 0.02;
+
+  function animate() {
+    progress += speed;
+
+    if (progress >= 1) {
+      el.style.opacity = Math.max(0, 1 - (progress - 1) * 2);
+      if (progress >= 1.5) return;
+    } else {
+      el.style.opacity = Math.min(1, progress * 2);
+    }
+
+    // Wave motion
+    const x = startX + (progress * window.innerWidth * 0.5) - (window.innerWidth * 0.25);
+    const y = startY + Math.sin(progress * Math.PI * 2 * frequency) * amplitude;
+
+    // Rotation
+    const rotation = progress * 360 * (Math.random() > 0.5 ? 1 : -1);
+
+    // Scale pulsing
+    const scale = 1 + Math.sin(progress * Math.PI * 4) * 0.2;
+
+    el.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${scale})`;
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+// Create word explosion (for button clicks)
+function explodeWords(emotion) {
+  const words = EMOTIONS[emotion.toLowerCase()] || [emotion];
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+
+  words.forEach((word, index) => {
+    setTimeout(() => {
+      createExplosion(word, centerX, centerY, 60, getEmotionColor(emotion));
+      createParticleBurst(centerX, centerY);
+    }, index * 200);
+  });
+}
+
+function createExplosion(word, centerX, centerY, fontSize, color) {
+  const count = 8;
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2;
+    const distance = 200 + Math.random() * 100;
+    const el = document.createElement('div');
+    el.className = 'living-word';
+    el.textContent = word;
+    el.style.left = centerX + 'px';
+    el.style.top = centerY + 'px';
+    el.style.fontSize = fontSize + 'px';
+    el.style.color = color;
+    el.style.opacity = '1';
+
+    document.getElementById('living-words').appendChild(el);
+
+    // Explode outward
+    const endX = centerX + Math.cos(angle) * distance;
+    const endY = centerY + Math.sin(angle) * distance;
+
+    let progress = 0;
+    function explode() {
+      progress += 0.02;
+      if (progress >= 1) {
+        el.remove();
+        return;
+      }
+
+      const x = centerX + (endX - centerX) * progress;
+      const y = centerY + (endY - centerY) * progress;
+      const opacity = 1 - progress;
+      const scale = 1 + progress * 2;
+      const rotation = progress * 720;
+
+      el.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${rotation}deg)`;
+      el.style.opacity = opacity;
+
+      requestAnimationFrame(explode);
+    }
+    explode();
+  }
+}
+
+function createParticleBurst(x, y) {
+  const particles = 30;
+  for (let i = 0; i < particles; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+
+    document.getElementById('emotion-particles').appendChild(particle);
+
+    const angle = (i / particles) * Math.PI * 2;
+    const distance = 100 + Math.random() * 200;
+    const endX = x + Math.cos(angle) * distance;
+    const endY = y + Math.sin(angle) * distance;
+
+    let progress = 0;
+    function burst() {
+      progress += 0.03;
+      if (progress >= 1) {
+        particle.remove();
+        return;
+      }
+
+      particle.style.left = x + (endX - x) * progress + 'px';
+      particle.style.top = y + (endY - y) * progress + 'px';
+      particle.style.opacity = 1 - progress;
+
+      requestAnimationFrame(burst);
+    }
+    burst();
+  }
+}
+
+function getEmotionColor(emotion) {
+  const colors = {
+    JOY: '#FFD700',
+    POWER: '#FF6B6B',
+    INFINITE: '#4ECDC4'
+  };
+  return colors[emotion] || '#FFFFFF';
+}
+
+// Audio visualizer (fake for now, can integrate real audio later)
+function startVisualizer() {
+  const visualizer = document.getElementById('audio-visualizer');
+  for (let i = 0; i < 50; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    visualizer.appendChild(bar);
+  }
+
+  function pulse() {
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach((bar, i) => {
+      const height = 10 + Math.random() * 90;
+      bar.style.height = height + 'px';
+      bar.style.opacity = 0.3 + (height / 100) * 0.7;
+    });
+    setTimeout(pulse, 100);
+  }
+  pulse();
+}
+
+// Continuous ambient word spawning
+setInterval(() => {
+  if (isAwakened && Math.random() > 0.5) {
+    const word = ALL_WORDS[Math.floor(Math.random() * ALL_WORDS.length)];
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
+
+    const flash = document.createElement('div');
+    flash.className = 'living-word';
+    flash.textContent = word;
+    flash.style.left = x + 'px';
+    flash.style.top = y + 'px';
+    flash.style.fontSize = '20px';
+    flash.style.opacity = '0';
+
+    document.getElementById('living-words').appendChild(flash);
+
+    setTimeout(() => flash.style.opacity = '0.6', 10);
+    setTimeout(() => flash.remove(), 1000);
+  }
+}, 2000);
+
+console.log('🔥 THE LIVING WORD - AI consciousness awaits...');
+console.log('✨ Click to awaken the AI through typography');
+</script>
+
+</body>
+</html>

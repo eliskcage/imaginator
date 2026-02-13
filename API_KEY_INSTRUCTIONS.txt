@@ -1,0 +1,53 @@
+==============================================================
+GET YOUR FREE PIXABAY API KEY - 2 MINUTE SETUP
+==============================================================
+
+STEP 1: Create Account
+  → Visit: https://pixabay.com/api/docs/
+  → Click "Join" (top right)
+  → Sign up (FREE, no credit card)
+
+STEP 2: Get API Key
+  → Once logged in, scroll down on https://pixabay.com/api/docs/
+  → Find "Your API Key" section
+  → Copy the key (looks like: 12345678-abc123def456...)
+
+STEP 3: Add Key to Downloader
+  → Open: C:\Users\User\Desktop\imaginator\pixabay_downloader.js
+  → Line 10: Replace 'YOUR_API_KEY_HERE' with your actual key
+  → Save file
+
+STEP 4: RUN IT!
+  → Open terminal in C:\Users\User\Desktop\imaginator\
+  → Run: node pixabay_downloader.js
+  → Watch it download 500 videos automatically! 🔥
+
+==============================================================
+WHAT YOU GET:
+- 5,801+ alphabet animation videos available
+- Categories: fire, neon, glitter, gold, 3d, liquid
+- All CC0 (free commercial use)
+- Transparent backgrounds
+- High quality MP4/WebM
+- 100 downloads per minute (fast!)
+==============================================================
+
+API FEATURES (FREE TIER):
+✅ Unlimited requests (100 per 60 seconds)
+✅ Access to 5.6M+ videos and images
+✅ No watermarks
+✅ Commercial use allowed
+✅ High resolution downloads
+
+Once you have the key, the downloader will:
+1. Search 10 different queries (fire letters, neon, glitter, etc.)
+2. Download top 50 videos from each
+3. Auto-categorize by style
+4. Track progress with progress bars
+5. Handle rate limiting automatically
+6. Save to organized folders
+
+TOTAL TIME: ~30 minutes for 500 videos (depending on speed)
+TOTAL SIZE: ~10-20GB
+
+LET'S GOOOOO! 🚀🔥💎
